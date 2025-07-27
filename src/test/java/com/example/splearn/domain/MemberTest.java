@@ -22,7 +22,7 @@ class MemberTest {
 				return encode(rawPassword).equals(encodedPassword);
 			}
 		};
-		normalMember = Member.create("test@test.com", "password123", "testuser", passwordEncoder);
+		normalMember = Member.create(new MemberCreateRequest("test@test.com", "password123", "testuser"), passwordEncoder);
 	}
 
 	@Test
@@ -32,7 +32,7 @@ class MemberTest {
 
 	@Test
 	void constructorNullCheck() {
-		Assertions.assertThatThrownBy(() -> Member.create(null, "password123", "testuser", passwordEncoder))
+		Assertions.assertThatThrownBy(() -> Member.create(new MemberCreateRequest(null, "password123", "testuser"), passwordEncoder))
 		          .isInstanceOf(NullPointerException.class);
 	}
 
@@ -110,5 +110,14 @@ class MemberTest {
 		normalMember.deactivate();
 
 		Assertions.assertThat(normalMember.isActive()).isFalse();
+	}
+
+	@Test
+	void invalidEmail() {
+		Assertions.assertThatThrownBy(() -> {
+			// Attempt to create a member with an invalid email
+			Member.create(new MemberCreateRequest("invalid-email", "password123", "testuser"), passwordEncoder);
+		}).isInstanceOf(IllegalArgumentException.class);
+
 	}
 }

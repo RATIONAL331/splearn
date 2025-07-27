@@ -1,6 +1,8 @@
 package com.example.splearn.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.util.Assert;
 
@@ -8,21 +10,22 @@ import java.util.Objects;
 
 @Getter
 @ToString
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Member {
-	private String email;
+	private Email email;
 	private String password;
 	private String nickname;
 	private MemberStatus status;
 
-	public static Member create(String email, String password, String nickname, PasswordEncoder passwordEncoder) {
-		return new Member(email, passwordEncoder.encode(password), nickname);
-	}
+	public static Member create(MemberCreateRequest request, PasswordEncoder passwordEncoder) {
+		Member member = new Member();
 
-	private Member(String email, String password, String nickname) {
-		this.email = Objects.requireNonNull(email);
-		this.password = Objects.requireNonNull(password);
-		this.nickname = Objects.requireNonNull(nickname);
-		this.status = MemberStatus.PENDING;
+		member.email = new Email(request.email());
+		member.password = passwordEncoder.encode(Objects.requireNonNull(request.password()));
+		member.nickname = Objects.requireNonNull(request.nickname());
+		member.status = MemberStatus.PENDING;
+
+		return member;
 	}
 
 	public void activate() {
