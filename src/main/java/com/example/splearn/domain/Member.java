@@ -13,22 +13,23 @@ import java.util.Objects;
 
 @Entity
 @Getter
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @NaturalIdCache // NaturalId 가 붙은 것으로 조회할 시 캐시 사용
-public class Member {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
-	@Embedded
+//@Table(uniqueConstraints = @UniqueConstraint(name = "UK_EMAIL_ADDRESS", columnNames = "email_address"))
+public class Member extends AbstractEntity {
+//	@Embedded
 	@NaturalId // NaturalId 는 고유한 값으로, 중복이 허용되지 않음
 	private Email email;
 
+//	@Column(nullable = false)
 	private String password;
+
+//	@Column(nullable = false)
 	private String nickname;
 
-	@Enumerated(EnumType.STRING)
+//	@Enumerated(EnumType.STRING)
+//	@Column(length = 50, nullable = false)
 	private MemberStatus status;
 
 	public static Member register(MemberRegisterRequest request, PasswordEncoder passwordEncoder) {
