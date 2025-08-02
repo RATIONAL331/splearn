@@ -5,34 +5,27 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static com.example.splearn.domain.MemberFixture.createMemberRegisterRequest;
+import static com.example.splearn.domain.MemberFixture.createPasswordEncoder;
+
 class MemberTest {
 	private Member normalMember;
 	private PasswordEncoder passwordEncoder;
 
 	@BeforeEach
 	void setUp() {
-		passwordEncoder = new PasswordEncoder() {
-			@Override
-			public String encode(String rawPassword) {
-				return rawPassword; // For testing, we return the raw password directly
-			}
-
-			@Override
-			public boolean matches(String rawPassword, String encodedPassword) {
-				return encode(rawPassword).equals(encodedPassword);
-			}
-		};
-		normalMember = Member.create(new MemberCreateRequest("test@test.com", "password123", "testuser"), passwordEncoder);
+		passwordEncoder = createPasswordEncoder();
+		normalMember = Member.register(createMemberRegisterRequest("test@test.com"), passwordEncoder);
 	}
 
 	@Test
-	void createMember() {
+	void registerMember() {
 		Assertions.assertThat(normalMember.getStatus()).isEqualTo(MemberStatus.PENDING);
 	}
 
 	@Test
 	void constructorNullCheck() {
-		Assertions.assertThatThrownBy(() -> Member.create(new MemberCreateRequest(null, "password123", "testuser"), passwordEncoder))
+		Assertions.assertThatThrownBy(() -> Member.register(createMemberRegisterRequest(null), passwordEncoder))
 		          .isInstanceOf(NullPointerException.class);
 	}
 
@@ -116,7 +109,7 @@ class MemberTest {
 	void invalidEmail() {
 		Assertions.assertThatThrownBy(() -> {
 			// Attempt to create a member with an invalid email
-			Member.create(new MemberCreateRequest("invalid-email", "password123", "testuser"), passwordEncoder);
+			Member.register(createMemberRegisterRequest("invalid-email"), passwordEncoder);
 		}).isInstanceOf(IllegalArgumentException.class);
 
 	}

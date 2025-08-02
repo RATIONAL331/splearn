@@ -1,6 +1,6 @@
 package com.example.splearn.domain;
 
-public record MemberCreateRequest(
+public record MemberRegisterRequest(
 		String email,
 		String password,
 		String nickname

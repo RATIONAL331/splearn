@@ -1,23 +1,37 @@
 package com.example.splearn.domain;
 
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.util.Assert;
 
 import java.util.Objects;
 
+@Entity
 @Getter
 @ToString
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NaturalIdCache // NaturalId 가 붙은 것으로 조회할 시 캐시 사용
 public class Member {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@Embedded
+	@NaturalId // NaturalId 는 고유한 값으로, 중복이 허용되지 않음
 	private Email email;
+
 	private String password;
 	private String nickname;
+
+	@Enumerated(EnumType.STRING)
 	private MemberStatus status;
 
-	public static Member create(MemberCreateRequest request, PasswordEncoder passwordEncoder) {
+	public static Member register(MemberRegisterRequest request, PasswordEncoder passwordEncoder) {
 		Member member = new Member();
 
 		member.email = new Email(request.email());
