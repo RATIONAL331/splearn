@@ -1,5 +1,7 @@
-package com.example.splearn.domain;
+package com.example.splearn.domain.member;
 
+import com.example.splearn.domain.AbstractEntity;
+import com.example.splearn.domain.shared.Email;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,6 +34,8 @@ public class Member extends AbstractEntity {
 //	@Column(length = 50, nullable = false)
 	private MemberStatus status;
 
+	private MemberDetail detail;
+
 	public static Member register(MemberRegisterRequest request, PasswordEncoder passwordEncoder) {
 		Member member = new Member();
 
@@ -39,6 +43,8 @@ public class Member extends AbstractEntity {
 		member.password = passwordEncoder.encode(Objects.requireNonNull(request.password()));
 		member.nickname = Objects.requireNonNull(request.nickname());
 		member.status = MemberStatus.PENDING;
+
+		member.detail = MemberDetail.create();
 
 		return member;
 	}
@@ -50,12 +56,14 @@ public class Member extends AbstractEntity {
 		Assert.state(MemberStatus.PENDING.equals(this.status), "Member is not in PENDING status");
 
 		this.status = MemberStatus.ACTIVE;
+		this.detail.activate();
 	}
 
 	public void deactivate() {
-		Assert.state(MemberStatus.ACTIVE.equals(this.status), "Member is not in PENDING status");
+		Assert.state(MemberStatus.ACTIVE.equals(this.status), "Member is not in ACTIVE status");
 
 		this.status = MemberStatus.DEACTIVATED;
+		this.detail.deactivate();
 	}
 
 	public boolean verifyPassword(String password, PasswordEncoder passwordEncoder) {
@@ -72,5 +80,12 @@ public class Member extends AbstractEntity {
 
 	public boolean isActive() {
 		return MemberStatus.ACTIVE.equals(this.status);
+	}
+
+	public void updateInfo(MemberInfoUpdateRequest request) {
+		Assert.state(MemberStatus.ACTIVE.equals(this.status), "Member is not in ACTIVE status");
+
+		this.nickname = Objects.requireNonNull(request.nickname());
+		this.detail.updateInfo(request);
 	}
 }

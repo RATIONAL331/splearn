@@ -1,7 +1,7 @@
-package com.example.splearn.application.required;
+package com.example.splearn.application.member.required;
 
-import com.example.splearn.domain.Member;
-import com.example.splearn.domain.MemberFixture;
+import com.example.splearn.domain.member.Member;
+import com.example.splearn.domain.member.MemberFixture;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 @DataJpaTest
 class MemberRepositoryTest {
 	@Autowired
-	private  MemberRepository memberRepository;
+	private MemberRepository memberRepository;
 
 	@Autowired
 	private EntityManager entityManager;
@@ -28,6 +28,10 @@ class MemberRepositoryTest {
 		Assertions.assertThat(member.getId()).isNotNull();
 
 		entityManager.flush();
+		entityManager.clear();
+
+		Member foundMember = memberRepository.findById(member.getId()).orElseThrow();
+		Assertions.assertThat(foundMember.getDetail().getRegisteredAt()).isNotNull();
 	}
 
 	@Test

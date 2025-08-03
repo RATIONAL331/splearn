@@ -1,4 +1,4 @@
-package com.example.splearn.domain;
+package com.example.splearn.domain.member;
 
 /**
  * 해당 인터페이스는 반드시 domain 패키지에 위치해야 합니다.

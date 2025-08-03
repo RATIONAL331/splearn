@@ -1,8 +1,8 @@
-package com.example.splearn.application.provided;
+package com.example.splearn.application.member.provided;
 
 import com.example.splearn.SplearnTestConfiguration;
-import com.example.splearn.domain.Member;
-import com.example.splearn.domain.MemberFixture;
+import com.example.splearn.domain.member.Member;
+import com.example.splearn.domain.member.MemberFixture;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

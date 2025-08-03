@@ -1,12 +1,12 @@
-package com.example.splearn.domain;
+package com.example.splearn.domain.member;
 
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static com.example.splearn.domain.MemberFixture.createMemberRegisterRequest;
-import static com.example.splearn.domain.MemberFixture.createPasswordEncoder;
+import static com.example.splearn.domain.member.MemberFixture.createMemberRegisterRequest;
+import static com.example.splearn.domain.member.MemberFixture.createPasswordEncoder;
 
 class MemberTest {
 	private Member normalMember;
@@ -21,6 +21,7 @@ class MemberTest {
 	@Test
 	void registerMember() {
 		Assertions.assertThat(normalMember.getStatus()).isEqualTo(MemberStatus.PENDING);
+		Assertions.assertThat(normalMember.getDetail().getRegisteredAt()).isNotNull();
 	}
 
 	@Test
@@ -34,6 +35,7 @@ class MemberTest {
 		normalMember.activate();
 
 		Assertions.assertThat(normalMember.getStatus()).isEqualTo(MemberStatus.ACTIVE);
+		Assertions.assertThat(normalMember.getDetail().getActivatedAt()).isNotNull();
 	}
 
 	@Test
@@ -46,12 +48,12 @@ class MemberTest {
 
 	@Test
 	void deactivateMember() {
-		;
 		normalMember.activate();
 
 		normalMember.deactivate();
 
 		Assertions.assertThat(normalMember.getStatus()).isEqualTo(MemberStatus.DEACTIVATED);
+		Assertions.assertThat(normalMember.getDetail().getDeactivatedAt()).isNotNull();
 	}
 
 	@Test
@@ -112,5 +114,34 @@ class MemberTest {
 			Member.register(createMemberRegisterRequest("invalid-email"), passwordEncoder);
 		}).isInstanceOf(IllegalArgumentException.class);
 
+	}
+
+	@Test
+	void updateInfo() {
+		normalMember.activate();
+
+		MemberInfoUpdateRequest request = new MemberInfoUpdateRequest(
+				"newnickname",
+				"profileAddress",
+				"Hello, I am a test user."
+		);
+		normalMember.updateInfo(request);
+
+		Assertions.assertThat(normalMember.getNickname()).isEqualTo(request.nickname());
+		Assertions.assertThat(normalMember.getDetail().getProfile().address()).isEqualTo(request.profileAddress());
+		Assertions.assertThat(normalMember.getDetail().getIntroduction()).isEqualTo(request.introduction());
+	}
+
+	@Test
+	void updateInfoFailed() {
+		MemberInfoUpdateRequest request = new MemberInfoUpdateRequest(
+				"newnickname",
+				"thisisprofileAddress",
+				"Hello, I am a test user."
+		);
+
+		Assertions.assertThatThrownBy(() ->
+				normalMember.updateInfo(request)
+		).isInstanceOf(IllegalStateException.class);
 	}
 }
